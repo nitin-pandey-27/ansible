@@ -1,4 +1,11 @@
 # Kubernetes Cluster using Ansible
+* Please follow pre-requisite before proceeding further.
+================
+I am using 1 master and 2 worker node with host names as - 
+master 
+worker01
+worker02
+================
 * Clone repository.
 * Create multiple centos8 servers. One master and many worker. Use vagrant like [here](https://github.com/edib/many_vagrant_machines)
 * Change the “ad_addr” in the env_variables file with the IP address of the Kubernetes master node.
