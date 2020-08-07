@@ -1,0 +1,58 @@
+---
+- hosts: kubernetes-master-nodes
+  become: yes
+  vars_files:
+  - env_variables
+  tasks:
+  - name: Pulling images required for setting up a Kubernetes cluster
+    shell: kubeadm config images pull
+
+  - name: Resetting kubeadm
+    shell: kubeadm reset -f
+    register: output
+
+  - name: Add proxy information
+    file:
+     path: /etc/profile.d/proxy.sh
+     state: touch
+
+  - name: Adding no proxy in proxy.sh file
+    blockinfile:
+     path: /etc/profile.d/proxy.sh
+     block: |
+      export NO_PROXY='192.168.1.197,192.168.1.123,192.168.1.241'   
+
+  - name: Change cgroups driver 
+    file: 
+     path: /etc/docker/daemon.json
+     state: touch
+
+  - name: Add content to the file
+    copy: 
+     src:  /root/kubernetes-setup/playbooks/daemon.json
+     dest: /etc/docker/daemon.json
+
+  - name: reload daemon before restarting docker
+    systemd:
+     daemon_reload: yes
+
+  - name: restart service docker 
+    systemd:
+     state: restarted
+     name: docker
+
+  - name: Initializing Kubernetes cluster
+    shell: kubeadm init --apiserver-advertise-address {{ad_addr}} --pod-network-cidr={{cidr_v}}
+    register: output
+
+  - name: Storing Logs and Generated token for future purpose
+    local_action: copy content="{{ output.stdout }}" dest="token_file"
+
+  - name: Copying required files
+    shell: |
+     mkdir -p $HOME/.kube
+     sudo cp -f /etc/kubernetes/admin.conf $HOME/.kube/config
+     sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+  - name: Install Network Add-on
+    command: kubectl apply -f https://docs.projectcalico.org/v3.14/manifests/calico.yaml

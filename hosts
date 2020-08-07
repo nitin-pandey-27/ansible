@@ -1,0 +1,21 @@
+[kubernetes-master-nodes]
+master ansible_host=192.168.1.197
+
+[kubernetes-worker-nodes]
+worker01 ansible_host=192.168.1.123
+worker02 ansible_host=192.168.1.241
+
+[kubernetes-addtional-master]
+worker01 ansible_host=192.168.1.123
+worker02 ansible_host=192.168.1.241
+
+
+[kubernetes:children]
+kubernetes-worker-nodes
+kubernetes-master-nodes
+
+[kubernetes:vars]
+ansible_password=root
+ansible_ssh_user=root
+
+
