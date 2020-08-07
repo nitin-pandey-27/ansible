@@ -4,6 +4,7 @@
 * Change the “ad_addr” in the env_variables file with the IP address of the Kubernetes master node.
 * Add the IP Addresses of the worker nodes and the master node in the “hosts” file.
 * Run the following command to setup the Kubernetes Master node.
+* Additional MASTER setup is in progress.
 
 ```
 ansible-playbook setup_master_node.yml
