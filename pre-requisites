@@ -1,0 +1,76 @@
+There are few pre requisites before installing K8s using ansible. 
+
+=====Update the host name on all the systems=====
+
+Type the hostnamectl command :
+
+```
+hostnamectl set-hostname newNameHere
+```
+
+
+
+Next Edit the /etc/hosts file:
+```
+sudo nano /etc/hosts
+```
+Replace any occurrence of the existing computer name with your new one.
+Add all host name in the file 
+  192.168.1.XXX - master
+	192.168.1.XXX - node01
+	192.168.1.XXX - node02 
+
+
+Reboot the system to changes take effect:
+```
+sudo reboot								
+```
+
+======Generate & Copy the key to all the hosts to allow password less login ==============
+
+- in case you want to create a new user for this please follow this link - 
+https://www.digitalocean.com/community/tutorials/initial-server-setup-with-centos-7
+
+root@infra-virtual-machine:~# ssh-keygen
+Generating public/private rsa key pair.
+Enter file in which to save the key (/root/.ssh/id_rsa):
+Created directory '/root/.ssh'.
+Enter passphrase (empty for no passphrase):
+Enter same passphrase again:
+Your identification has been saved in /root/.ssh/id_rsa.
+Your public key has been saved in /root/.ssh/id_rsa.pub.
+The key fingerprint is:
+SHA256:ovNc0gXss5i5yln28PIHvWENlPSQtVnKcG+AiQx9LLY root@infra-virtual-machine
+The key's randomart image is:
++---[RSA 2048]----+
+|      .+ ++*+ .  |
+|       .* O* B   |
+|       .o=  * o  |
+|       .E..  .   |
+|      . S..o     |
+|     . *.++ .    |
+|    o O +o o     |
+|   . B.B  o      |
+|    +.+o+.       |
++----[SHA256]-----+
+root@infra-virtual-machine:~# cat .ssh/id_rsa.pub
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDQzE5S1/9figo306BKvH20DHofJoux8vanxL7dRbe74OrmUPPgtNXtzTKNKJbxwUzzHzT5qteCVonLO0VAuo3B8hAG+fqjLHzez5c5Zwhfe7H4r+u5PG4C66sS9uHpLcpB7gCPg1PpKhwvpn7x0oX4StJdB+DG6DRDtpEICkWVVsTj4xvHj3HEZHrgRKxCp0i2sHICTMnLh5+VEvS9leaBX1JZk8sdYVoKClo/cSGbGixZmoQkTV/OBCUH7qycCxAdcfrSfFvLxz6viVBUifVWss+tBYFTxLLPvuZ3SW59av6CP6oowHcv8dMoggszYQgAFRzH62AaMCxB6azsYKhT root@master
+
+
+---- ON ALL OTHER NODES -- run below command on all other nodes --- 
+
+```
+cat >> ~/.ssh/authorized_keys <<EOF
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDQzE5S1/9figo306BKvH20DHofJoux8vanxL7dRbe74OrmUPPgtNXtzTKNKJbxwUzzHzT5qteCVonLO0VAuo3B8hAG+fqjLHzez5c5Zwhfe7H4r+u5PG4C66sS9uHpLcpB7gCPg1PpKhwvpn7x0oX4StJdB+DG6DRDtpEICkWVVsTj4xvHj3HEZHrgRKxCp0i2sHICTMnLh5+VEvS9leaBX1JZk8sdYVoKClo/cSGbGixZmoQkTV/OBCUH7qycCxAdcfrSfFvLxz6viVBUifVWss+tBYFTxLLPvuZ3SW59av6CP6oowHcv8dMoggszYQgAFRzH62AaMCxB6azsYKhT root@master
+EOF
+```
+
+---> create this directory if doesnt exist 
+root@node02:~# mkdir -p ~/.ssh/		
+
+root@node02:~# cat >> ~/.ssh/authorized_keys <<EOF
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDQzE5S1/9figo306BKvH20DHofJoux8vanxL7dRbe74OrmUPPgtNXtzTKNKJbxwUzzHzT5qteCVonLO0VAuo3B8hAG+fqjLHzez5c5Zwhfe7H4r+u5PG4C66sS9uHpLcpB7gCPg1PpKhwvpn7x0oX4StJdB+DG6DRDtpEICkWVVsTj4xvHj3HEZHrgRKxCp0i2sHICTMnLh5+VEvS9leaBX1JZk8sdYVoKClo/cSGbGixZmoQkTV/OBCUH7qycCxAdcfrSfFvLxz6viVBUifVWss+tBYFTxLLPvuZ3SW59av6CP6oowHcv8dMoggszYQgAFRzH62AaMCxB6azsYKhT root@master
+EOF
+root@node02:~#
+
+From master node, perform ssh to node01 and node02. It should work fine without asking for any password.
