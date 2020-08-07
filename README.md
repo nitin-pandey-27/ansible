@@ -8,6 +8,15 @@
 ```
 ansible-playbook setup_master_node.yml
 ```
+
+* After you executed above command, please run 
+
+```
+cd playbooks 
+cat token_file > join_token
+```
+
+
 * Once the master node is ready, run the following command to set up the worker nodes.
 
 ```
